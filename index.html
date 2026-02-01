@@ -279,7 +279,7 @@ const initialQuestionText = questionText.textContent;
 const sounds = {
   tap: new Audio("assets/audio/tap.wav"),
   error: new Audio("assets/audio/faaah.mp3"),
-  success: new Audio("assets/audio/yay.mp3"),
+  yay: new Audio("assets/audio/yay.mp3"),
   bgm: new Audio("assets/audio/bgm.mp3"),
   phew: new Audio("assets/audio/phew.mp3"),
   cat: new Audio("assets/audio/cat.mp3"),
@@ -291,7 +291,7 @@ const sounds = {
 // Volume tuning
 sounds.tap.volume = 0.2;
 sounds.error.volume = 0.15;
-sounds.success.volume = 0.4;
+sounds.yay.volume = 0.4;
 sounds.phew.volume = 0.3;
 sounds.cat.volume = 0.3;
 sounds.happy.volume = 0.4;
@@ -449,7 +449,7 @@ function finishDestined() {
 function friendzoneYes() {
   app.classList.add("shake");
   setTimeout(() => app.classList.remove("shake"), 300);
-  
+
   shrink(yesBtn);
   updateText([
     "Okay okay, shooting your shot, respect.",
