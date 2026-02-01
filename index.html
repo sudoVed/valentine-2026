@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Valentine 💘</title>
+<title>Valentino</title>
 
 <style>
 :root {
@@ -197,6 +197,8 @@ let mode = "friendzone";
 let failCount = 0;
 let finished = false;
 
+const given_name = "V";
+
 /* ---------- ELEMENTS ---------- */
 const namePage = document.getElementById("namePage");
 const questionPage = document.getElementById("questionPage");
@@ -266,7 +268,7 @@ startBtn.onclick = () => {
     return;
   }
 
-  mode = (name === "v") ? "destined" : "friendzone";
+  mode = (name === given_name.toLowerCase()) ? "destined" : "friendzone";
   namePage.classList.add("hidden");
   questionPage.classList.remove("hidden");
 
