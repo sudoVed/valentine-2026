@@ -500,7 +500,11 @@ function updateText(lines) {
 function surpriseInteraction(surpriseBtn, buttonWrap) {
   // Remove the surprise button
   surpriseBtn.remove();
-  
+  if (sounds.phew) {
+    sounds.phew.pause();
+    sounds.phew.currentTime = 0;
+    sounds.phew.loop = false;
+  }
   // Update question
   questionText.textContent = "Do you not have a Valentine?";
 
