@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Valentine 💘</title>
+
+<style>
+:root {
+  --pink: #ff4d88;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #ffdde1);
+  background-size: 400% 400%;
+  animation: gradient 12s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("assets/images/bg.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  z-index: 0;
+}
+
+
+/* ---------- BACKGROUND EFFECT LAYER ---------- */
+#effects {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+  from { transform: translateY(-20px); }
+  to   { transform: translateY(120vh); }
+}
+
+
+/* ---------- APP CONTAINER ---------- */
+.container {
+  position: relative;
+  z-index: 5;
+  background: rgba(255,255,255,0.95);
+  padding: 2rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  transition: all 0.4s ease;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+/* ---------- BUTTONS ---------- */
+.button-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+button {
+  padding: 14px 18px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+.primary {
+  background: var(--pink);
+  color: white;
+}
+
+.secondary {
+  background: #eee;
+}
+
+.hidden {
+  display: none;
+}
+
+.shake {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+/* ---------- EFFECTS ---------- */
+.heart {
+  position: absolute;
+  bottom: -20px;
+  opacity: 0.7;
+  animation: floatUp 6s linear forwards;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(0); opacity: 0.7; }
+  to { transform: translateY(-110vh); opacity: 0; }
+}
+
+.mute {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="effects"></div>
+<div class="mute">🔊</div>
+
+<div class="container" id="app">
+
+    <!-- INTRO PAGE -->
+    <div id="introPage">
+    <h1>Hey there cutie, you know Valentine’s is coming up right?</h1>
+    <div class="button-wrap">
+        <button class="primary" id="introBtn">Yeah it’s close..</button>
+    </div>
+    </div>
+
+
+  <!-- NAME PAGE -->
+  <div id="namePage" class="hidden">
+    <h1>Enter your name 💖</h1>
+    <input id="nameInput" placeholder="Your name..." />
+    <div class="button-wrap">
+      <button class="primary" id="startBtn">Continue</button>
+    </div>
+    <p id="nameError"></p>
+  </div>
+
+  <!-- QUESTION PAGE -->
+  <div id="questionPage" class="hidden">
+    <h1 id="questionText">Will you be my Valentine?</h1>
+    <div class="button-wrap">
+      <button id="yesBtn" class="primary">YES 💖</button>
+      <button id="noBtn" class="secondary">NO ❌</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- STATE ---------- */
+let mode = "friendzone";
+let failCount = 0;
+let finished = false;
+
+/* ---------- ELEMENTS ---------- */
+const namePage = document.getElementById("namePage");
+const questionPage = document.getElementById("questionPage");
+const startBtn = document.getElementById("startBtn");
+const nameInput = document.getElementById("nameInput");
+const nameError = document.getElementById("nameError");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const questionText = document.getElementById("questionText");
+const app = document.getElementById("app");
+const effects = document.getElementById("effects");
+const muteBtn = document.querySelector(".mute");
+const introPage = document.getElementById("introPage");
+const introBtn = document.getElementById("introBtn");
+
+
+const sounds = {
+  tap: new Audio("assets/audio/tap.wav"),
+  error: new Audio("assets/audio/faaah.mp3"),
+  success: new Audio("assets/audio/yay.mp3"),
+  bgm: new Audio("assets/audio/bgm.mp3"),
+  phew: new Audio("assets/audio/phew.mp3"),
+};
+
+// Volume tuning
+sounds.tap.volume = 0.2;
+sounds.error.volume = 0.15;
+sounds.success.volume = 0.4;
+sounds.bgm.volume = 0.4;
+
+sounds.bgm.loop = true;
+
+/* ---------- START ---------- */
+introBtn.onclick = () => {
+  // 🔓 unlock audio (important for mobile)
+  Object.values(sounds).forEach(sound => {
+    sound.muted = true;
+    sound.play().catch(() => {});
+    sound.pause();
+    sound.currentTime = 0;
+    sound.muted = false;
+  });
+
+  // 🎵 start background music
+  sounds.bgm.volume = 0.4;
+  sounds.bgm.loop = true;
+  sounds.bgm.play().catch(() => {});
+
+  // ✨ transition to name page
+  introPage.classList.add("hidden");
+  namePage.classList.remove("hidden");
+};
+
+
+startBtn.onclick = () => {
+    playSound(sounds.tap);
+
+  const name = nameInput.value.trim().toLowerCase();
+
+  if (!name) {
+    nameError.textContent = "Bro entered air.";
+    return;
+  }
+
+  if (name === "admin") {
+    nameError.textContent = "Nice try.";
+    return;
+  }
+
+  mode = (name === "v") ? "destined" : "friendzone";
+  namePage.classList.add("hidden");
+  questionPage.classList.remove("hidden");
+
+  spawnHearts();
+  console.log("Since you're here… respect.");
+};
+
+/* ---------- BUTTON HANDLERS ---------- */
+yesBtn.onclick = () => handleChoice("yes");
+noBtn.onclick = () => handleChoice("no");
+
+muteBtn.onclick = () => {
+  toggleMute();
+  muteBtn.textContent = muted ? "🔇" : "🔊";
+  playSound(sounds.tap);
+};
+
+function startExperience() {
+  sounds.bgm.currentTime = 0;
+  sounds.bgm.play();
+}
+
+let muted = false;
+
+function toggleMute() {
+  muted = !muted;
+  Object.values(sounds).forEach(sound => {
+    sound.muted = muted;
+  });
+}
+
+function playSound(sound) {
+  if (muted) return;
+  sound.currentTime = 0;
+  sound.play();
+}
+
+
+function handleChoice(choice) {
+  if (finished) return;
+
+  failCount++;
+  app.classList.add("shake");
+  setTimeout(() => app.classList.remove("shake"), 300);
+
+  if (mode === "destined") {
+    if (choice === "no") {
+      playSound(sounds.error);
+      destinedNo();
+    } else {
+      playSound(sounds.success);
+      finishDestined();
+    }
+  } else {
+    if (choice === "yes") {
+      playSound(sounds.error);
+      friendzoneYes();
+    } else {
+      playSound(sounds.phew);
+      finishFriendzone();
+    }
+  }
+}
+
+/* ---------- DESTINED ---------- */
+function destinedNo() {
+  shrink(noBtn);
+  updateText([
+    "Blink twice if you meant to press ‘Yes’.",
+    "Take your time. The ‘Yes’ isn’t going anywhere.",
+    "You sure you’re pressing the right one?",
+    "You're making the ‘Yes’ button sad 😢",
+    "I think the ‘No’ button has had enough attention."
+  ]);
+
+  if (failCount >= 5) {
+    noBtn.remove();
+    yesBtn.style.width = "100%";
+  }
+}
+
+function finishDestined() {
+  finished = true;
+  confetti("✨");
+  questionText.textContent = "Guess it’s a date then 💕";
+  yesBtn.remove();
+  noBtn?.remove();
+}
+
+/* ---------- FRIENDZONE ---------- */
+function friendzoneYes() {
+  shrink(yesBtn);
+  updateText([
+    "Okay okay, shooting your shot, respect.",
+    "Good taste but uhh..",
+    "At least now we can laugh about this.. right?",
+    "My therapist's gonna hear about this one.",
+    "That ‘No’ button REALLY wants you."
+  ]);
+  if (failCount >= 5) {
+    yesBtn.remove();
+    noBtn.style.width = "100%";
+  }
+}
+
+function finishFriendzone() {
+  finished = true;
+  questionText.textContent = "Status: still friends, still awesome, duh";
+  yesBtn?.remove();
+  noBtn.remove();
+}
+
+/* ---------- HELPERS ---------- */
+function shrink(btn) {
+  const scale = Math.max(0.2, 1 - failCount * 0.15);
+  btn.style.transform = `scale(${scale})`;
+}
+
+function updateText(lines) {
+  questionText.textContent =
+    lines[Math.min(failCount - 1, lines.length - 1)];
+}
+
+/* ---------- EFFECTS ---------- */
+function spawnHearts() {
+  setInterval(() => {
+    const h = document.createElement("div");
+    h.className = "heart";
+    h.textContent = "💖";
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = 14 + Math.random() * 20 + "px";
+    effects.appendChild(h);
+    setTimeout(() => h.remove(), 6000);
+  }, 900);
+}
+
+function confetti(symbol, total = 40, interval = 80) {
+  let count = 0;
+
+  const spawn = setInterval(() => {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.textContent = symbol;
+
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.top = "-20px";
+    c.style.animationDuration = 2 + Math.random() * 2 + "s"; // variation
+
+    effects.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
+
+    count++;
+    if (count >= total) clearInterval(spawn);
+  }, interval);
+}
+
+
+</script>
+
+</body>
+</html>
