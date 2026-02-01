@@ -208,6 +208,10 @@ button.maxed {
   background: rgba(255, 255, 255, 1);
 }
 
+#questionText {
+  white-space: pre-line;
+}
+
 </style>
 </head>
 
@@ -241,7 +245,7 @@ button.maxed {
 
   <!-- QUESTION PAGE -->
   <div id="questionPage" class="hidden">
-    <h1 id="questionText">Will you be my Valentine?</h1>
+    <h2 id="questionText">Will you be my Valentine?</h2>
     <div class="button-wrap">
       <button id="yesBtn" class="primary">YES 💖</button>
       <button id="noBtn" class="secondary">NO ❌</button>
@@ -425,7 +429,7 @@ function destinedNo() {
 function finishDestined() {
   finished = true;
   confetti("✨");
-  questionText.textContent = "Guess it’s a date then 💕";
+  questionText.textContent = "Aa raha hai mujhe paseena\nJo isse padhe, woh hi meri haseena.";
   yesBtn.remove();
   noBtn?.remove();
 
