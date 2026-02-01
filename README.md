@@ -1,10 +1,11 @@
-# 💖 Valentino: Interactive Valentine Web Experience 💖
+# 💖 Valentino: Interactive Valentine Web Experience 
 
-![Valentino Preview](assets/images/happy.gif)
 
 Valentino is a **playful, interactive web page** built for Valentine’s Day.  
 It’s full of **hearts, confetti, GIFs, and sounds** — and reacts to your choices in real-time.  
 Will you get the date… or land in the friendzone? 😎
+
+Click here to try [Valentino](https://sudoved.github.io/valentine-2026/)
 
 ---
 
